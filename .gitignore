@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.streamlit/
+uploads/
+tailored_resumes/
+*.db
+!chronos.db
