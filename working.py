@@ -1,30 +1,47 @@
 import streamlit as st
+from database import SessionLocal, Job
+import pandas as pd
 
-st.set_page_config(page_title="Chronos Talent - Working", page_icon="✅")
+st.set_page_config(page_title="Chronos Talent", page_icon="🤖", layout="wide")
 
-st.title("✅ Chronos Talent - Working Version")
-st.write("Testing database connection...")
+st.title("🤖 Chronos Talent - AI Job Platform")
+st.markdown("---")
 
 try:
-    # Try to import database
-    from database import SessionLocal, Job
-    st.success("✅ Database imported successfully!")
-    
-    # Try to connect
+    # Connect to database
     db = SessionLocal()
-    job_count = db.query(Job).count()
-    st.success(f"✅ Connected to database! Found {job_count} jobs")
+    jobs = db.query(Job).all()
     
-    # Show first job as sample
-    if job_count > 0:
-        first_job = db.query(Job).first()
-        st.write("---")
-        st.subheader("📌 Sample Job:")
-        st.write(f"**Title:** {first_job.title}")
-        st.write(f"**Company:** {first_job.company}")
-        st.write(f"**Location:** {first_job.location}")
+    # Show metrics
+    st.subheader("📊 Dashboard")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Jobs", len(jobs))
+    with col2:
+        applied = sum(1 for j in jobs if j.is_applied)
+        st.metric("Applied", applied)
+    with col3:
+        st.metric("Pending", len(jobs) - applied)
+    
+    # Show jobs table
+    st.markdown("---")
+    st.subheader("📋 Available Jobs")
+    
+    # Create dataframe
+    job_data = []
+    for job in jobs:
+        job_data.append({
+            "Title": job.title,
+            "Company": job.company,
+            "Location": job.location,
+            "Category": job.category or "General",
+            "Status": "✅ Applied" if job.is_applied else "⏳ Pending"
+        })
+    
+    df = pd.DataFrame(job_data)
+    st.dataframe(df, use_container_width=True)
     
     db.close()
     
 except Exception as e:
-    st.error(f"❌ Error: {str(e)}")
+    st.error(f"Error: {str(e)}")
