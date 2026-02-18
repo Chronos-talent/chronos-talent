@@ -1,65 +1,31 @@
-#!/usr/bin/env python3
-"""
-Chronos Talent - Main Program
-"""
-
 import streamlit as st
-from database import SessionLocal, Job
-import pandas as pd
+import sys
 
-# Page config
-st.set_page_config(
-    page_title="Chronos Talent",
-    page_icon="🤖",
-    layout="wide"
-)
+st.set_page_config(page_title="Chronos Talent Test", page_icon="🤖")
 
-# Title
-st.title("🤖 Chronos Talent AI Job Platform")
-st.markdown("---")
+st.title("🤖 Chronos Talent - Test Page")
+st.write("If you can see this, Streamlit is working!")
 
-def main():
-    try:
-        # Connect to database
-        session = SessionLocal()
-        jobs = session.query(Job).all()
-        total_jobs = len(jobs)
-        pending = session.query(Job).filter_by(is_applied=False).count()
-        
-        # Show metrics
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("Total Jobs", total_jobs)
-        with col2:
-            st.metric("Pending Applications", pending)
-        with col3:
-            st.metric("Applied", total_jobs - pending)
-        
-        st.markdown("---")
-        
-        # Show jobs table
-        st.subheader("📋 Available Jobs")
-        
-        if jobs:
-            # Convert to DataFrame for display
-            job_data = []
-            for job in jobs:
-                job_data.append({
-                    "Title": job.title,
-                    "Company": job.company,
-                    "Location": job.location,
-                    "Applied": "✅" if job.is_applied else "⏳"
-                })
-            
-            df = pd.DataFrame(job_data)
-            st.dataframe(df, use_container_width=True)
-        else:
-            st.info("No jobs found in database")
-        
-        session.close()
-        
-    except Exception as e:
-        st.error(f"Error: {str(e)}")
+st.subheader("System Info:")
+st.write(f"Python version: {sys.version}")
 
-if __name__ == "__main__":
-    main()
+try:
+    st.write("Attempting to import database...")
+    from database import SessionLocal, Job
+    st.success("✅ Database imported successfully!")
+    
+    st.write("Attempting to connect to database...")
+    session = SessionLocal()
+    st.success("✅ Database connected!")
+    
+    st.write("Counting jobs...")
+    total_jobs = session.query(Job).count()
+    st.success(f"✅ Found {total_jobs} jobs!")
+    
+    session.close()
+    
+except Exception as e:
+    st.error(f"❌ ERROR: {str(e)}")
+    st.write("Error type:", type(e).__name__)
+    import traceback
+    st.code(traceback.format_exc())
