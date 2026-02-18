@@ -3,7 +3,7 @@
 Chronos Talent - Main Program
 """
 
-from scrapers.linkedin_scraper import LinkedInScraper
+# from scrapers.linkedin_scraper import LinkedInScraper
 from database import SessionLocal, Job
 import time
 
@@ -14,11 +14,12 @@ def mine_jobs():
     print("="*50)
     
     # Create scraper
-    scraper = LinkedInScraper()
+    # scraper = LinkedInScraper()
     
     try:
         # Search for jobs
-        jobs_found = scraper.search_jobs()
+        # jobs_found = scraper.search_jobs()
+        jobs_found = 0  # Temporary placeholder
         
         # Show summary
         session = SessionLocal()
@@ -35,7 +36,8 @@ def mine_jobs():
         print("="*50 + "\n")
         
     finally:
-        scraper.close()
+        # scraper.close()
+        pass
 
 if __name__ == "__main__":
     print("🚀 Starting Chronos Talent...")
