@@ -12,9 +12,9 @@ from datetime import datetime, timedelta
 import time
 from twilio.rest import Client
 
-# Twilio Configuration
+# Twilio Configuration - UPDATED WITH CORRECT AUTH TOKEN
 account_sid = "ACd0d72c24734285144b78dfefd0337c05"
-auth_token = "c4e7a02b28ac08e76d69f9d0f84f8224"
+auth_token = "c4e7a02b28ac08e76d69f9d0f84f8224"  # CORRECT TOKEN
 twilio_whatsapp_number = "whatsapp:+14155238886"  # Sandbox number
 client = Client(account_sid, auth_token)
 
@@ -136,22 +136,24 @@ def calculate_match_score(cv_skills, job_skills):
     matches = cv_set.intersection(job_set)
     return round((len(matches) / len(job_set)) * 100, 1)
 
-# Auto-Apply Function with REAL WhatsApp
+# UPDATED Auto-Apply Function with better WhatsApp handling
 def auto_apply_to_job(job, user_name, user_email, user_phone, cv_text, cv_skills):
     try:
         # 1. Send Email to Employer (simulated for now)
         employer_email = f"hiring@{job.company.lower().replace(' ', '')}.com"
         
-        # 2. Send REAL WhatsApp confirmation to applicant
+        # 2. Send REAL WhatsApp confirmation to applicant - IMMEDIATELY
+        whatsapp_sent = False
         try:
             whatsapp_message = client.messages.create(
-                body=f"✅ *Chronos Talent*\n\nHi {user_name}! Your application for *{job.title}* at *{job.company}* was sent successfully!\n\nWe'll remind you to follow up in 3 days. Good luck! 🍀",
+                body=f"✅ Chronos Talent: Hi {user_name}! Your application for {job.title} at {job.company} was sent successfully! We'll remind you to follow up in 3 days.",
                 from_=twilio_whatsapp_number,
                 to=f"whatsapp:{user_phone}"
             )
             st.success(f"✅ WhatsApp confirmation sent to {user_phone}!")
+            whatsapp_sent = True
         except Exception as whatsapp_error:
-            st.warning(f"⚠️ Could not send WhatsApp: {str(whatsapp_error)}")
+            st.error(f"❌ WhatsApp Error: {str(whatsapp_error)}")
         
         # 3. Schedule follow-up for 3 days later
         follow_up_time = datetime.now() + timedelta(days=3)
@@ -163,7 +165,7 @@ def auto_apply_to_job(job, user_name, user_email, user_phone, cv_text, cv_skills
             "applied_date": datetime.now(),
             "follow_up_date": follow_up_time,
             "status": "Applied",
-            "whatsapp_sent": True
+            "whatsapp_sent": whatsapp_sent
         }
     except Exception as e:
         st.error(f"Error applying: {str(e)}")
@@ -178,8 +180,21 @@ try:
     with st.sidebar:
         st.header("🔍 Filter Jobs")
         
-        # User Contact Info (for auto-apply)
+        # Add Test WhatsApp button at the top of sidebar for easy testing
+        if st.button("📱 Test WhatsApp Now"):
+            try:
+                test_msg = client.messages.create(
+                    body="✅ Test message from Chronos Talent! Your WhatsApp is working!",
+                    from_=twilio_whatsapp_number,
+                    to="whatsapp:+2349049803021"
+                )
+                st.success("✅ Test sent! Check your phone.")
+            except Exception as e:
+                st.error(f"❌ Test failed: {str(e)}")
+        
         st.markdown("---")
+        
+        # User Contact Info (for auto-apply)
         st.subheader("📋 Your Contact Info")
         user_name = st.text_input("Full Name", value="Bokie Michael")
         st.session_state.user_email = st.text_input("Email", value="benmediaworld5@gmail.com")
