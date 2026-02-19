@@ -4,3 +4,4 @@ pandas
 PyPDF2
 docx2txt
 scikit-learn
+twilio==8.10.0
