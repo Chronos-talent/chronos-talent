@@ -14,7 +14,7 @@ from twilio.rest import Client
 
 # Twilio Configuration
 account_sid = "ACd0d72c24734285144b78dfefd0337c05"
-auth_token = "VC5455Z33D3EX3JHV3SXLB9A"
+auth_token = "c4e7a02b28ac08e76d69f9d0f84f8224"
 twilio_whatsapp_number = "whatsapp:+14155238886"  # Sandbox number
 client = Client(account_sid, auth_token)
 
