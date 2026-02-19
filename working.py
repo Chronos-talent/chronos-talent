@@ -56,31 +56,123 @@ def extract_text_from_docx(docx_file):
     except:
         return ""
 
-# Function to extract skills from text
+# UNIVERSAL SKILL DATABASE - Works for ANY career
 def extract_skills(text):
-    # Common AI/tech skills to look for
-    skill_keywords = {
-        "Python": ["python", "django", "flask"],
-        "JavaScript": ["javascript", "js", "node.js", "react", "vue"],
-        "OpenAI API": ["openai", "gpt", "chatgpt", "llm"],
-        "Machine Learning": ["machine learning", "ml", "tensorflow", "pytorch", "scikit-learn"],
-        "Data Science": ["data science", "pandas", "numpy", "jupyter"],
-        "AI Tools": ["langchain", "hugging face", "transformers", "llama"],
-        "Automation": ["automation", "zapier", "make", "integromat", "n8n"],
-        "No-Code": ["no-code", "low-code", "bubble", "adalo", "flutterflow"],
-        "Chatbot": ["chatbot", "rasa", "botpress", "voiceflow", "dialogflow"],
-        "Cloud": ["aws", "azure", "gcp", "cloud"],
-        "Database": ["sql", "postgresql", "mongodb", "redis"],
-        "DevOps": ["docker", "kubernetes", "ci/cd", "jenkins"],
-        "API": ["api", "rest", "graphql", "fastapi"],
-        "Communication": ["communication", "presentation", "leadership", "teamwork"],
-        "Sales": ["sales", "b2b", "client", "negotiation", "account management"]
-    }
-    
     text_lower = text.lower()
     found_skills = []
     skill_categories = {}
     
+    # Comprehensive skill keywords for ALL professions
+    skill_keywords = {
+        # TECH SKILLS
+        "Python": ["python", "django", "flask", "fastapi", "pandas", "numpy"],
+        "JavaScript": ["javascript", "js", "node.js", "react", "vue", "angular", "typescript"],
+        "Java": ["java", "spring", "maven", "gradle"],
+        "C++": ["c++", "cpp", "c plus plus"],
+        "C#": ["c#", "c sharp", ".net", "dotnet"],
+        "Ruby": ["ruby", "rails", "ruby on rails"],
+        "PHP": ["php", "laravel", "wordpress"],
+        "SQL": ["sql", "mysql", "postgresql", "database", "query"],
+        "HTML/CSS": ["html", "css", "scss", "sass", "bootstrap", "tailwind"],
+        "Cloud": ["aws", "azure", "gcp", "cloud", "lambda", "ec2", "s3"],
+        "DevOps": ["docker", "kubernetes", "jenkins", "ci/cd", "github actions"],
+        "Mobile Dev": ["android", "ios", "swift", "kotlin", "flutter", "react native"],
+        
+        # AI & DATA SKILLS
+        "Machine Learning": ["machine learning", "ml", "tensorflow", "pytorch", "keras", "ai"],
+        "Data Science": ["data science", "data analysis", "analytics", "statistics", "visualization"],
+        "OpenAI API": ["openai", "gpt", "chatgpt", "llm", "claude", "anthropic", "langchain"],
+        "Data Visualization": ["tableau", "power bi", "looker", "grafana"],
+        "Big Data": ["hadoop", "spark", "kafka", "data pipeline"],
+        
+        # AI TOOLS & AUTOMATION
+        "Automation": ["automation", "zapier", "make", "integromat", "n8n", "workflow"],
+        "No-Code": ["no-code", "low-code", "bubble", "adalo", "flutterflow", "retool"],
+        "Chatbot": ["chatbot", "rasa", "botpress", "voiceflow", "dialogflow", "twilio"],
+        "AI Tools": ["langchain", "hugging face", "transformers", "llama", "embedding"],
+        
+        # BUSINESS & SALES SKILLS
+        "Sales": ["sales", "b2b", "business development", "client acquisition", "revenue", "quota"],
+        "Account Management": ["account management", "client relations", "customer success", "key accounts"],
+        "CRM": ["crm", "salesforce", "hubspot", "zoho", "pipedrive"],
+        "Negotiation": ["negotiation", "closing", "deal", "contract"],
+        "Lead Generation": ["lead generation", "prospecting", "cold calling", "outreach"],
+        "Sales Strategy": ["sales strategy", "go-to-market", "gtm", "territory management"],
+        
+        # MARKETING SKILLS
+        "Digital Marketing": ["digital marketing", "online marketing", "growth marketing"],
+        "Content Creation": ["content", "writing", "blog", "copywriting", "editorial"],
+        "SEO": ["seo", "search engine optimization", "keyword research"],
+        "Social Media": ["social media", "instagram", "linkedin", "tiktok", "twitter"],
+        "Email Marketing": ["email marketing", "mailchimp", "campaign", "newsletter"],
+        "Marketing Analytics": ["marketing analytics", "google analytics", "data studio"],
+        
+        # COMMUNICATION & SOFT SKILLS
+        "Communication": ["communication", "verbal", "written", "presentation", "public speaking"],
+        "Leadership": ["leadership", "team lead", "management", "mentoring", "supervising"],
+        "Project Management": ["project management", "agile", "scrum", "jira", "confluence", "trello"],
+        "Problem Solving": ["problem solving", "critical thinking", "analytical", "troubleshooting"],
+        "Teamwork": ["teamwork", "collaboration", "cross-functional", "interpersonal"],
+        "Time Management": ["time management", "organization", "multitasking", "deadline"],
+        
+        # CREATIVE SKILLS
+        "Graphic Design": ["graphic design", "photoshop", "illustrator", "figma", "canva"],
+        "UI/UX Design": ["ui", "ux", "user interface", "user experience", "wireframe", "prototype"],
+        "Video Editing": ["video editing", "premiere", "final cut", "davinci resolve"],
+        "Photography": ["photography", "photo editing", "lightroom"],
+        "Writing": ["writing", "creative writing", "technical writing", "editing"],
+        
+        # HR & RECRUITING
+        "Recruiting": ["recruiting", "talent acquisition", "sourcing", "headhunting"],
+        "HR": ["hr", "human resources", "employee relations", "onboarding", "benefits"],
+        "Training": ["training", "learning & development", "l&d", "coaching"],
+        
+        # FINANCE & ADMIN
+        "Accounting": ["accounting", "bookkeeping", "quickbooks", "xero", "audit"],
+        "Finance": ["finance", "financial analysis", "budgeting", "forecasting"],
+        "Excel": ["excel", "spreadsheet", "vba", "pivot tables"],
+        "Administrative": ["administration", "office management", "executive assistant", "scheduling"],
+        
+        # CUSTOMER SERVICE
+        "Customer Service": ["customer service", "customer support", "help desk", "client service"],
+        "Technical Support": ["technical support", "it support", "helpdesk", "troubleshooting"],
+        
+        # HEALTHCARE
+        "Healthcare": ["healthcare", "medical", "clinical", "patient care", "nursing"],
+        "Medical Coding": ["medical coding", "cpt", "icd-10", "billing"],
+        
+        # EDUCATION
+        "Teaching": ["teaching", "education", "instruction", "curriculum", "lesson planning"],
+        "ESL": ["esl", "english as second language", "tefl", "tesol"],
+        
+        # LEGAL
+        "Legal": ["legal", "law", "attorney", "lawyer", "paralegal", "contract law"],
+        "Compliance": ["compliance", "regulatory", "policy", "risk management"],
+        
+        # ENGLISH/ARTS (for your CV!)
+        "English": ["english", "literature", "creative writing", "grammar", "editing"],
+        "Teaching English": ["teaching english", "esl instructor", "language teacher"],
+        "Editing": ["editing", "proofreading", "copy editing", "manuscript"],
+        "Research": ["research", "academic research", "qualitative research", "literature review"],
+        "Liberal Arts": ["liberal arts", "humanities", "arts", "philosophy", "history"],
+    }
+    
+    # Also look for job titles/roles
+    role_keywords = {
+        "Sales": ["sales representative", "account executive", "sdr", "bdr", "sales manager"],
+        "Marketing": ["marketing manager", "marketing specialist", "growth hacker"],
+        "Engineering": ["software engineer", "developer", "programmer", "tech lead"],
+        "Data": ["data scientist", "data analyst", "data engineer"],
+        "Product": ["product manager", "product owner", "product specialist"],
+        "Design": ["designer", "ui designer", "ux designer", "graphic designer"],
+        "HR": ["hr manager", "recruiter", "talent acquisition"],
+        "Customer Support": ["customer support", "customer service", "support specialist"],
+        "Teacher": ["teacher", "instructor", "professor", "educator", "lecturer"],
+        "Writer": ["writer", "content writer", "copywriter", "editor"],
+        "Administrative": ["administrative assistant", "executive assistant", "office manager"],
+    }
+    
+    # Check for skills
     for category, keywords in skill_keywords.items():
         for keyword in keywords:
             if keyword in text_lower:
@@ -88,7 +180,83 @@ def extract_skills(text):
                 skill_categories[category] = skill_categories.get(category, 0) + 1
                 break
     
+    # Check for roles
+    for category, keywords in role_keywords.items():
+        for keyword in keywords:
+            if keyword in text_lower:
+                role_skill = f"{category} Role"
+                if role_skill not in found_skills:
+                    found_skills.append(role_skill)
+                break
+    
+    # If no skills found, try to extract based on common sections
+    if len(found_skills) < 3:
+        # Look for education section
+        if "bachelor" in text_lower or "master" in text_lower or "phd" in text_lower or "degree" in text_lower:
+            found_skills.append("Higher Education")
+        
+        # Look for work experience
+        if "year" in text_lower or "experience" in text_lower or "worked" in text_lower:
+            found_skills.append("Professional Experience")
+        
+        # Look for languages
+        if "english" in text_lower or "french" in text_lower or "spanish" in text_lower:
+            found_skills.append("Languages")
+    
     return list(set(found_skills)), skill_categories
+
+# Function to match job requirements based on category
+def get_job_requirements(job):
+    try:
+        category = job.category
+    except:
+        category = "General"
+    
+    title_lower = job.title.lower()
+    
+    # Sales & Business Development jobs
+    if any(word in title_lower for word in ["sales", "sdr", "account executive", "ae", "business development"]):
+        return ["Communication", "Sales", "Negotiation", "CRM", "Lead Generation", "Account Management"]
+    
+    # Marketing jobs
+    elif any(word in title_lower for word in ["marketing", "growth", "seo", "content"]):
+        return ["Digital Marketing", "Content Creation", "SEO", "Social Media", "Marketing Analytics", "Communication"]
+    
+    # Engineering jobs
+    elif any(word in title_lower for word in ["engineer", "developer", "programmer", "software", "backend", "frontend"]):
+        return ["Python", "JavaScript", "Java", "SQL", "Cloud", "Problem Solving"]
+    
+    # AI/ML jobs
+    elif any(word in title_lower for word in ["ai", "machine learning", "data scientist", "llm"]):
+        return ["Python", "Machine Learning", "OpenAI API", "Data Science", "SQL", "Problem Solving"]
+    
+    # Design jobs
+    elif any(word in title_lower for word in ["designer", "ui", "ux", "graphic"]):
+        return ["UI/UX Design", "Graphic Design", "Figma", "Creative", "Communication"]
+    
+    # Writing/Content jobs
+    elif any(word in title_lower for word in ["writer", "content", "copywriter", "editor"]):
+        return ["Writing", "Editing", "Content Creation", "Communication", "Research"]
+    
+    # Teaching/Education jobs
+    elif any(word in title_lower for word in ["teacher", "instructor", "educator", "professor"]):
+        return ["Teaching", "Communication", "Curriculum Development", "Patience", "Leadership"]
+    
+    # Customer Service jobs
+    elif any(word in title_lower for word in ["customer service", "support", "help desk"]):
+        return ["Customer Service", "Communication", "Problem Solving", "Patience", "CRM"]
+    
+    # HR/Recruiting jobs
+    elif any(word in title_lower for word in ["hr", "recruiter", "talent", "human resources"]):
+        return ["Recruiting", "HR", "Communication", "Interviewing", "Sourcing"]
+    
+    # Administrative jobs
+    elif any(word in title_lower for word in ["administrative", "executive assistant", "office manager"]):
+        return ["Administrative", "Organization", "Time Management", "Excel", "Communication"]
+    
+    # Default for other roles
+    else:
+        return ["Communication", "Problem Solving", "Teamwork", "Adaptability"]
 
 # Function to calculate match score
 def calculate_match_score(cv_skills, job_skills):
@@ -143,43 +311,19 @@ try:
                 if cv_skills:
                     st.success(f"✅ Found {len(cv_skills)} skills!")
                     
-                    # Show skills in columns
-                    col1, col2 = st.columns(2)
-                    for i, skill in enumerate(cv_skills[:6]):
-                        if i < 3:
-                            col1.info(f"📌 {skill}")
-                        else:
-                            col2.info(f"📌 {skill}")
+                    # Show skills in a nice format
+                    st.markdown("**Your Skills:**")
                     
-                    if len(cv_skills) > 6:
-                        st.caption(f"... and {len(cv_skills)-6} more skills")
+                    # Group skills by category for better display
+                    for i, skill in enumerate(cv_skills[:8]):
+                        st.info(f"📌 {skill}")
+                    
+                    if len(cv_skills) > 8:
+                        st.caption(f"... and {len(cv_skills)-8} more skills")
                     
                     # Calculate match scores for all jobs
                     for job in jobs:
-                        # Define job skills based on category and title
-                        job_skills = []
-                        try:
-                            category = job.category
-                        except:
-                            category = "General"
-                        
-                        # Map job categories to required skills
-                        if "AI" in str(category) or "Machine Learning" in str(job.title):
-                            job_skills = ["Python", "Machine Learning", "OpenAI API", "Data Science"]
-                        elif "Chatbot" in str(category) or "Bot" in str(job.title):
-                            job_skills = ["Python", "Chatbot", "API", "JavaScript"]
-                        elif "Automation" in str(category) or "Automation" in str(job.title):
-                            job_skills = ["Automation", "Python", "API", "No-Code"]
-                        elif "Prompt" in str(category) or "LLM" in str(job.title):
-                            job_skills = ["OpenAI API", "Machine Learning", "Python", "Communication"]
-                        elif "No-Code" in str(category):
-                            job_skills = ["No-Code", "Automation", "API", "JavaScript"]
-                        elif "Sales" in str(category) or "SDR" in str(job.title):
-                            job_skills = ["Communication", "Sales", "API", "CRM"]
-                        else:
-                            job_skills = ["Communication", "Problem Solving", "Teamwork"]
-                        
-                        # Calculate match score
+                        job_skills = get_job_requirements(job)
                         match_scores[job.id] = calculate_match_score(cv_skills, job_skills)
         
         st.markdown("---")
@@ -187,20 +331,15 @@ try:
         # Category filter
         categories = ["All", "AI Automation", "Prompt Engineering", "No-Code AI", 
                       "Chatbot Development", "AI Consultant", "Tech Sales", 
-                      "Solutions Engineer", "AI Integration"]
+                      "Solutions Engineer", "AI Integration", "Marketing", 
+                      "Design", "Writing", "Customer Service", "Administrative"]
         selected_category = st.selectbox("Job Category", categories)
         
         # Job type filter
         job_types = ["All", "Remote", "Hybrid", "On-site", "Freelance/Contract"]
         selected_type = st.selectbox("Job Type", job_types)
         
-        # Skill filter
-        all_skills = ["Python", "JavaScript", "OpenAI API", "Machine Learning", 
-                     "Automation", "No-Code", "Chatbot", "Cloud", "API", 
-                     "Communication", "Sales", "Data Science"]
-        selected_skills = st.multiselect("Skills/Tools", all_skills)
-        
-        st.info("💡 **Skills Over Degrees**\n\nWe match you based on what you can build, not your degree!")
+        st.info("💡 **Skills Over Degrees**\n\nWe match you based on what you can do, not your degree!")
     
     # Main content
     col1, col2, col3, col4 = st.columns(4)
@@ -231,38 +370,44 @@ try:
                         st.success(f"🔥 {score}% Match")
                     elif score >= 50:
                         st.info(f"📊 {score}% Match")
+                    elif score >= 30:
+                        st.info(f"📌 {score}% Match")
                     else:
-                        st.warning(f"📌 {score}% Match")
+                        st.warning(f"🔍 {score}% Match")
+                    
+                    job_skills = get_job_requirements(job)
+                    matching_skills = set(cv_skills).intersection(set(job_skills))
                     
                     st.markdown(f"""
                     **{job.title}**  
                     {job.company} · {job.location}  
-                    🏷️ {getattr(job, 'category', 'General')}
                     
-                    *Skills you have: {min(3, len(cv_skills))} matching skills*
+                    **Matching skills:** {', '.join(list(matching_skills)[:3]) if matching_skills else 'None'}
+                    
+                    *{len(matching_skills)} of {len(job_skills)} skills match*
                     """)
     
     # Featured Categories
     st.markdown("---")
-    st.subheader("🎯 Featured AI Categories")
+    st.subheader("🎯 Featured Categories")
     
     cat_col1, cat_col2, cat_col3, cat_col4 = st.columns(4)
     
     with cat_col1:
-        st.markdown("**🤖 AI Automation**")
-        st.caption("Build workflows, integrate AI tools")
+        st.markdown("**🤖 AI & Tech**")
+        st.caption("AI/ML, Engineering, Data")
         
     with cat_col2:
-        st.markdown("**⚡ Prompt Engineering**")
-        st.caption("LLM specialists, ChatGPT experts")
+        st.markdown("**💼 Business**")
+        st.caption("Sales, Marketing, HR")
         
     with cat_col3:
-        st.markdown("**🔧 No-Code AI**")
-        st.caption("Build AI apps without code")
+        st.markdown("**🎨 Creative**")
+        st.caption("Design, Writing, Content")
         
     with cat_col4:
-        st.markdown("**💬 Chatbot Dev**")
-        st.caption("Rasa, Botpress, Voiceflow")
+        st.markdown("**📚 Education**")
+        st.caption("Teaching, Research, Training")
     
     # Jobs Table
     st.markdown("---")
@@ -276,12 +421,14 @@ try:
         except:
             # Smart category assignment
             title_lower = job.title.lower()
-            if "sales" in title_lower or "sdr" in title_lower:
-                category = "Tech Sales"
-            elif "engineer" in title_lower:
-                category = "Solutions Engineer"
-            elif "ai" in title_lower or "machine learning" in title_lower:
+            if any(word in title_lower for word in ["sales", "sdr", "account executive"]):
+                category = "Sales"
+            elif any(word in title_lower for word in ["engineer", "developer"]):
+                category = "Engineering"
+            elif any(word in title_lower for word in ["ai", "machine learning"]):
                 category = "AI/ML"
+            elif any(word in title_lower for word in ["marketing", "growth"]):
+                category = "Marketing"
             else:
                 category = "General"
         
@@ -296,8 +443,10 @@ try:
                 match_display = f"🔥 {score}% Match"
             elif score >= 50:
                 match_display = f"📊 {score}% Match"
-            else:
+            elif score >= 30:
                 match_display = f"📌 {score}% Match"
+            else:
+                match_display = f"🔍 {score}% Match"
         
         job_data.append({
             "Title": job.title,
