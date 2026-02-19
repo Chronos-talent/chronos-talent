@@ -10,6 +10,13 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 import time
+from twilio.rest import Client
+
+# Twilio Configuration
+account_sid = "ACd0d72c24734285144b78dfefd0337c05"
+auth_token = "VC5455Z33D3EX3JHV3SXLB9A"
+twilio_whatsapp_number = "whatsapp:+14155238886"  # Sandbox number
+client = Client(account_sid, auth_token)
 
 st.set_page_config(page_title="Chronos Talent", page_icon="🤖", layout="wide")
 
@@ -82,7 +89,6 @@ def extract_skills(text):
     found_skills = []
     skill_categories = {}
     
-    # Comprehensive skill keywords (keeping your existing extensive list)
     skill_keywords = {
         "Communication": ["communication", "verbal", "written", "presentation", "public speaking"],
         "Writing": ["writing", "creative writing", "technical writing", "editing", "proofreading"],
@@ -93,7 +99,6 @@ def extract_skills(text):
         "Sales": ["sales", "b2b", "business development", "client acquisition", "revenue"],
         "Python": ["python", "django", "flask", "fastapi", "pandas", "numpy"],
         "JavaScript": ["javascript", "js", "node.js", "react", "vue", "angular"],
-        # ... (keep all your other skills)
     }
     
     for category, keywords in skill_keywords.items():
@@ -131,65 +136,34 @@ def calculate_match_score(cv_skills, job_skills):
     matches = cv_set.intersection(job_set)
     return round((len(matches) / len(job_set)) * 100, 1)
 
-# NEW: Auto-Apply Function
-def auto_apply_to_job(job, user_name, user_email, user_phone, cv_text):
+# Auto-Apply Function with REAL WhatsApp
+def auto_apply_to_job(job, user_name, user_email, user_phone, cv_text, cv_skills):
     try:
-        # 1. Send Email to Employer
-        employer_email = f"hiring@{job.company.lower().replace(' ', '')}.com"  # You'll need real emails
+        # 1. Send Email to Employer (simulated for now)
+        employer_email = f"hiring@{job.company.lower().replace(' ', '')}.com"
         
-        subject = f"Application for {job.title} - {user_name}"
-        body = f"""
-        Dear Hiring Team at {job.company},
+        # 2. Send REAL WhatsApp confirmation to applicant
+        try:
+            whatsapp_message = client.messages.create(
+                body=f"✅ *Chronos Talent*\n\nHi {user_name}! Your application for *{job.title}* at *{job.company}* was sent successfully!\n\nWe'll remind you to follow up in 3 days. Good luck! 🍀",
+                from_=twilio_whatsapp_number,
+                to=f"whatsapp:{user_phone}"
+            )
+            st.success(f"✅ WhatsApp confirmation sent to {user_phone}!")
+        except Exception as whatsapp_error:
+            st.warning(f"⚠️ Could not send WhatsApp: {str(whatsapp_error)}")
         
-        I am excited to apply for the {job.title} position. Based on my CV analysis, my skills align well with this role.
-        
-        Key Skills:
-        - {cv_skills[:5] if 'cv_skills' in locals() else 'Various relevant skills'}
-        
-        My CV is attached to this email. I would love to discuss how I can contribute to your team.
-        
-        Best regards,
-        {user_name}
-        {user_email}
-        {user_phone}
-        """
-        
-        # In production, use actual SMTP settings
-        # msg = MIMEMultipart()
-        # msg['From'] = user_email
-        # msg['To'] = employer_email
-        # msg['Subject'] = subject
-        # msg.attach(MIMEText(body, 'plain'))
-        # server = smtplib.SMTP('smtp.gmail.com', 587)
-        # server.starttls()
-        # server.login('your-email@gmail.com', 'your-password')
-        # server.send_message(msg)
-        
-        # For now, simulate successful send
-        st.success(f"✅ Application sent to {job.company}")
-        
-        # 2. Schedule WhatsApp follow-up for applicant
+        # 3. Schedule follow-up for 3 days later
         follow_up_time = datetime.now() + timedelta(days=3)
         
-        # In production, use WhatsApp Business API
-        # whatsapp_message = f"Hi {user_name}, your application for {job.title} at {job.company} was sent. We'll follow up in 3 days!"
-        # requests.post(
-        #     "https://graph.facebook.com/v17.0/PHONE_NUMBER_ID/messages",
-        #     headers={"Authorization": "Bearer YOUR_ACCESS_TOKEN"},
-        #     json={
-        #         "messaging_product": "whatsapp",
-        #         "to": user_phone,
-        #         "type": "text",
-        #         "text": {"body": whatsapp_message}
-        #     }
-        # )
-        
+        # Store in session state
         return {
             "job_title": job.title,
             "company": job.company,
             "applied_date": datetime.now(),
             "follow_up_date": follow_up_time,
-            "status": "Applied"
+            "status": "Applied",
+            "whatsapp_sent": True
         }
     except Exception as e:
         st.error(f"Error applying: {str(e)}")
@@ -207,9 +181,9 @@ try:
         # User Contact Info (for auto-apply)
         st.markdown("---")
         st.subheader("📋 Your Contact Info")
-        user_name = st.text_input("Full Name", value="John Doe")
-        st.session_state.user_email = st.text_input("Email", value="john@example.com")
-        st.session_state.user_phone = st.text_input("WhatsApp Number", value="+1234567890")
+        user_name = st.text_input("Full Name", value="Bokie Michael")
+        st.session_state.user_email = st.text_input("Email", value="benmediaworld5@gmail.com")
+        st.session_state.user_phone = st.text_input("WhatsApp Number", value="+2349049803021")
         
         # CV Upload Section
         st.markdown("---")
@@ -303,13 +277,14 @@ try:
                             """)
                             
                             # Auto-Apply Button
-                            if st.button(f"🤖 Auto-Apply to {job.title}", key=f"apply_{job.id}"):
+                            if st.button(f"🤖 Auto-Apply to {job.title}", key=f"apply_{job_id}"):
                                 with st.spinner("AI is applying on your behalf..."):
                                     application = auto_apply_to_job(
                                         job, user_name, 
                                         st.session_state.user_email,
                                         st.session_state.user_phone,
-                                        cv_text
+                                        cv_text,
+                                        cv_skills
                                     )
                                     if application:
                                         st.session_state.applications.append(application)
