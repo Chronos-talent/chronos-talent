@@ -27,14 +27,20 @@ try:
     st.markdown("---")
     st.subheader("📋 Available Jobs")
     
-    # Create dataframe
+    # Create dataframe - SAFELY handle missing category
     job_data = []
     for job in jobs:
+        # Safely get category - if it doesn't exist, use "General"
+        try:
+            category = job.category
+        except AttributeError:
+            category = "General"
+            
         job_data.append({
             "Title": job.title,
             "Company": job.company,
             "Location": job.location,
-            "Category": job.category or "General",
+            "Category": category,  # Now safe!
             "Status": "✅ Applied" if job.is_applied else "⏳ Pending"
         })
     
